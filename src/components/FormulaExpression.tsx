@@ -7,17 +7,26 @@
 import { FormulaExpressionProvider } from "@/contexts/FormulaExpressionContext";
 import Operator from "./Operator";
 import Value from "./Value";
-import ResetButton from "@/contexts/ResetButton";
+import ResetButton from "@/components/ResetButton";
+import { FormulaValue } from "./FormulaValue";
 
-export default function FormulaExpression() {
+export default function FormulaExpression({
+  name,
+  children,
+}: {
+  name: string;
+  children?: React.ReactNode;
+}) {
   return (
-    <FormulaExpressionProvider>
+    <FormulaExpressionProvider name={name}>
       <div className="flex gap-2">
         <Value index={0} />
         <Operator />
         <Value index={1} />
         <ResetButton />
+        {children}
       </div>
+      <FormulaValue name={name} />
     </FormulaExpressionProvider>
   );
 }

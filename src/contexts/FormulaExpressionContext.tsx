@@ -4,19 +4,34 @@ import {
   type Operator,
   type VariableType,
   getVariableByName,
+  FreeKey,
+  FormulaKey,
 } from "@/lib/data";
 
-type ValidValue = Variable["name"] | "free" | null;
+export type ValidValue =
+  | Variable["name"]
+  | typeof FreeKey
+  | typeof FormulaKey
+  | null;
 
 type FormulaExpressionContextValue = {
+  name: string | null;
+  formula: FormulaType | null;
   values: ValidValue[];
   operator: Operator["name"] | null;
-  setValue: (index: number, v: Variable["name"] | null) => void;
+  setValue: (index: number, v: ValidValue) => void;
   setOperator: (o: Operator["name"] | null) => void;
   typeConstraint: VariableType | null;
   freeValue: { value: string; type: VariableType } | null;
   setFreeValue: (v: { value: string; type: VariableType } | null) => void;
   reset: () => void;
+};
+
+export type FormulaType = {
+  val1: { key: ValidValue; value: string; type: VariableType };
+  val2: { key: ValidValue; value: string; type: VariableType };
+  operator: Operator["name"];
+  freeValue: { value: string; type: VariableType } | null;
 };
 
 const FormulaExpressionContext = createContext<
@@ -25,8 +40,10 @@ const FormulaExpressionContext = createContext<
 
 export function FormulaExpressionProvider({
   children,
+  name,
 }: {
   children: ReactNode;
+  name: string | null;
 }) {
   const [values, setValuesState] = useState<ValidValue[]>([null, null]);
   const [operator, setOperator] = useState<Operator["name"] | null>(null);
@@ -62,6 +79,21 @@ export function FormulaExpressionProvider({
     setFreeValueState(null);
   }
 
+  const formula: FormulaType = {
+    val1: {
+      key: values[0],
+      value: values[0] ?? "",
+      type: typeConstraint ?? "string",
+    },
+    val2: {
+      key: values[1],
+      value: values[1] ?? "",
+      type: typeConstraint ?? "string",
+    },
+    operator: operator ?? "",
+    freeValue: freeValueState,
+  };
+
   return (
     <FormulaExpressionContext.Provider
       value={{
@@ -73,6 +105,8 @@ export function FormulaExpressionProvider({
         freeValue: freeValueState,
         setFreeValue,
         reset,
+        name,
+        formula,
       }}
     >
       {children}

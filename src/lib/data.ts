@@ -3,7 +3,10 @@ export const TypeList = ["int", "string", "boolean"] as const;
 export type VariableType = (typeof TypeList)[number];
 export type OperatorCategory = "Comparison" | "Arithmetic" | "Logical";
 
-export type Variable = { name: string; type: VariableType };
+export type Variable = {
+  name: (typeof variablesData)[number]["name"];
+  type: VariableType;
+};
 
 const variablesData = [
   { name: "transaction.amount", type: "int" },
@@ -12,6 +15,9 @@ const variablesData = [
   { name: "transaction.sender.last_name", type: "string" },
   { name: "transaction.has_3DS", type: "boolean" },
 ] as const;
+
+export const FreeKey = "__free__";
+export const FormulaKey = "__formula__";
 
 export type Operator = {
   name: string;
